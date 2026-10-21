@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentHub — Учёт объектов недвижимости</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <script>
+        const mockProperties = [
+            { id: 1, title: 'Уютная студия в центре города', description: 'Светлая студия со всеми удобствами, мебелью и панорамным видом на проспект.', pricePerNight: 2500, location: 'г. Барнаул, пр. Ленина, д. 10', src: 'kvar1.jpg', type: 'Студия' },
+            { id: 2, title: 'Современная двухкомнатная квартира', description: 'Рядом с вокзалом. Полностью меблирована, установлены Wi-Fi и кондиционер.', pricePerNight: 4000, location: 'г. Барнаул, ул. Молодежная, д. 34', src: 'kvar2.jpg', type: 'Квартира' },
+            { id: 3, title: 'Загородный дом с баней', description: 'Отличное место для отдыха на выходных в кругу семьи или компании друзей.', pricePerNight: 8500, location: 'пригород Барнаула, пос. Власиха', src: 'kvar3.jpg', type: 'Дом' }
+        ];
+
+        const getPropertiesMock = () => {
+            return new Promise((resolve) => {
+                setTimeout(() => { resolve(mockProperties); }, 1500);
+            });
+        };
+
+        let state = {
+            properties: [],
+            isLoading: true
+        };
+
+        const rootElement = document.getElementById('root');
+
+        function render() {
+            const headerHTML = `
+                <header class="site-header">
+                    <div class="logo-container">
+                        <img src="logo.png" alt="RentHub" class="site-logo" onerror="this.style.display='none'">
+                        <span style="font-size: 24px; font-weight: bold; color: #ecf0f1; margin-left: 10px;"></span>
+                    </div>
+                    <nav class="navigation">
+                        <ul class="nav-list">
+                            <li><a href="#" class="nav-link active">Главная</a></li>
+                            <li><a href="#" class="nav-link">Объекты</a></li>
+                            <li><a href="#" class="nav-link">Договоры</a></li>
+                        </ul>
+                    </nav>
+                </header>
+            `;
+
+            const heroHTML = `
+                <section class="hero-block">
+                    <h1 class="hero-title">Учёт объектов недвижимости «RentHub»</h1>
+                    <p class="hero-subtitle">Система автоматизации арендного фонда, контроля занятости помещений и взаиморасчетов в Барнауле.</p>
+                </section>
+            `;
+
+            if (state.isLoading) {
+                rootElement.innerHTML = `
+                    ${headerHTML}
+                    <main class="main-container">
+                        ${heroHTML}
+                        <section class="catalog-section">
+                            <h2 class="section-title">Объекты в управлении</h2>
+                            <div style="text-align: center; font-size: 22px; color: #7f8c8d; padding: 50px 0; font-weight: bold;">
+                                Загрузка списка объектов...
+                            </div>
+                        </section>
+                    </main>
+                `;
+            } else {
+                const cardsHTML = state.properties.map(item => `
+                    <div class="property-card">
+                        <img src="${item.src}" alt="${item.title}" class="card-image">
+                        <div class="card-body">
+                            <span class="type-badge">${item.type}</span>
+                            <h3 class="card-title">${item.title}</h3>
+                            <p class="card-description">${item.description}</p>
+                            <p class="card-location"> ${item.location}</p>
+                            <div class="card-footer">
+                                <span class="card-price">${item.pricePerNight} ₽ / ночь</span>
+                                <button class="card-button">Подробнее</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                rootElement.innerHTML = `
+                    ${headerHTML}
+                    <main class="main-container">
+                        ${heroHTML}
+                        <section class="catalog-section">
+                            <h2 class="section-title">Объекты в управлении</h2>
+                            <div class="properties-grid">
+                                ${cardsHTML}
+                            </div>
+                        </section>
+                    </main>
+                `;
+            }
+        }
+
+        window.onload = () => {
+            render();
+
+            getPropertiesMock().then((data) => {
+                state.properties = data;
+                state.isLoading = false;
+                render();
+            });
+        };
+    </script>
+</body>
+</html>
